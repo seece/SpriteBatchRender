@@ -43,6 +43,12 @@ Output path must be of format
 
 where `%s` and `%s` will be replaced by frame name and rotation step respectively.
 
+### Step names
+When rendering ZDoom compatible sprites, the following naming schemes need to be used.
+
+* 8 steps, set step names to `12345678` (default)
+* 16 steps, set step names to `192A3B4C5D6E7F8G`
+
 ## Installation
 Place [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) in `Blender/$VERSION/scripts/addons` or in `%APPDATA%/Roaming/Blender Foundation/Blender/$VERSION/scripts/addons` where `$VERSION` is your version number.
 
