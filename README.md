@@ -26,6 +26,15 @@ See `Sprite Batch Rendering` section of the `Render`-tab for controls.
 
 Note: the rendering process can't be canceled once started, so make sure your `Frame Range` and image resolution are correct.
 
+### Example .blend file
+[http://www.lofibucket.com/blender/monkeeh.blend](monkeeh.blend) is an example how to set up the scene for sprite rendering.
+
+The setup is the following:
+* Camera is set to track the Suzanne mesh
+* Camera projection is set to projection mode
+* Scene render size is set to 128x128
+* Frame range has been set to 1-1
+
 ### Path format
 
 Output path must be of format
@@ -34,9 +43,10 @@ Output path must be of format
 
 where `%s` and `%s` will be replaced by frame name and rotation step respectively.
 
-## Gotchas
+## Installation
+Place [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) in `Blender/$VERSION/scripts/addons` or in `%APPDATA%/Roaming/Blender Foundation/Blender/$VERSION/scripts/addons` where `$VERSION` is your version number.
 
-You should set the `Start Frame` property to 0 for the script to name frames properly. It's set to 1 by default.
+See [Installation of an Add-On](http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Add-Ons#Installation_of_an_Add-On) for more help.
 
 ## License
 MIT License, see `COPYING` for details.
