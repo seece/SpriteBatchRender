@@ -3,7 +3,7 @@ SpriteBatchRender
 
 A spritesheet rendering plugin for Blender.
 
-![Blender addon GUI](http://i.imgur.com/CtjAuz2.png)
+![Blender addon GUI](http://i.imgur.com/P4hUCm5.png)
 
 ## What it does
 
@@ -30,9 +30,9 @@ Note: the rendering process can't be canceled once started, so make sure your `F
 
 Output path must be of format
 
-    C:/some/path/sprite%s%d.png
+	C:/some/path/sprite%s%s.png
 
-where `%s` and `%d` will be replaced by frame name and rotation angle respectively.
+where `%s` and `%s` will be replaced by frame name and rotation step respectively.
 
 ## Gotchas
 
