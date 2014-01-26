@@ -50,7 +50,7 @@ bl_info = \
 	{
 		"name" : "Sprite Batch Render",
 		"author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-		"version" : (1, 0, 0),
+		"version" : (1, 1, 0),
 		"blender" : (2, 6, 0),
 		"location" : "Render",
 		"description" :
@@ -92,10 +92,8 @@ class SpriteRenderPanel(bpy.types.Panel):
 		framerow = l.row()
 		
 		l.row().prop(context.scene, "sprite_render_steps", text="Rotation steps")
-		l.row().prop(context.scene, "sprite_render_custom_framenames")
 		
-		if context.scene.sprite_render_custom_framenames:
-			l.column().prop(context.scene, "sprite_render_framenames", text="Frame names")
+		l.column().prop(context.scene, "sprite_render_framenames", text="Frame names")
 		
 		l.column().prop(context.scene, "sprite_render_anglenames", text="Step names")
 
@@ -117,9 +115,6 @@ def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, e
 
 	stepnames = anglenames
 	
-	if not scene.sprite_render_custom_framenames:
-		framenames = [chr(ord("A") + x) for x in range(startframe,endframe+1)]
-
 	if endframe-startframe > len(framenames)-1:
 		raise Exception("Not enough frames in custom framenames")
 
@@ -130,6 +125,9 @@ def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, e
 	
 	for f in range(startframe, endframe+1):
 		scene.frame_current = f
+		relative_frame = f - startframe
+
+		print()
 		
 		for i in range(0, steps):
 			angle = ((math.pi*2.0) / steps) * i
@@ -145,7 +143,7 @@ def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, e
 			camera.location.y = math.sin(angle) * distance
 			
 			stepname = stepnames[i]
-			name = framenames[f]
+			name = framenames[relative_frame]
 			
 			scene.render.filepath = filepath % (name, stepname)
 			bpy.ops.render.render(animation=False, write_still=True)
@@ -181,16 +179,9 @@ def register():
 		name = "Frame names",
 		description = """The naming scheme for all frames.
  Each letter corresponds to a single frame.""",
-		default = "ABCDEFGH"
+		default = "ABCDEFGHIJKLMN"
 	)
 	
-	bpy.types.Scene.sprite_render_custom_framenames = BoolProperty (
-		name = "Use custom frame names",
-		description = "Use generated alphabetical names instead of custom defined characters.",
-		default = False
-	)
-    
-
 	bpy.types.Scene.sprite_render_anglenames = StringProperty (
 		name = "Step names",
 		description = """The naming scheme for rotation steps.
@@ -204,7 +195,6 @@ def unregister():
 	del bpy.types.Scene.sprite_render_path
 	del bpy.types.Scene.sprite_render_steps
 	del bpy.types.Scene.sprite_render_framenames
-	del bpy.types.Scene.sprite_render_custom_framenames
 	del bpy.types.Scene.sprite_render_anglenames
 
 	

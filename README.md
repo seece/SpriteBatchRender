@@ -3,7 +3,7 @@ SpriteBatchRender
 
 A spritesheet rendering plugin for Blender.
 
-![Blender addon GUI](http://i.imgur.com/P4hUCm5.png)
+![Blender addon GUI](http://i.imgur.com/mTThmPK.png)
 
 ## What it does
 
