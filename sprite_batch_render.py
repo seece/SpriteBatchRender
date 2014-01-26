@@ -51,7 +51,7 @@ bl_info = \
 		"name" : "Sprite Batch Render",
 		"author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
 		"version" : (1, 0, 0),
-		"blender" : (2, 6, 8),
+		"blender" : (2, 6, 0),
 		"location" : "Render",
 		"description" :
 			"Renders the scene from multiple directions.",
