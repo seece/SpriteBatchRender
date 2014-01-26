@@ -72,6 +72,7 @@ class SpriteRenderOperator(bpy.types.Operator):
 			context.scene.sprite_render_path, 
 			context.scene.sprite_render_steps,
 			context.scene.sprite_render_framenames,
+			context.scene.sprite_render_anglenames,
 			context.scene.frame_start, 
 			context.scene.frame_end
 		)
@@ -92,30 +93,37 @@ class SpriteRenderPanel(bpy.types.Panel):
 		
 		l.row().prop(context.scene, "sprite_render_steps", text="Rotation steps")
 		l.row().prop(context.scene, "sprite_render_custom_framenames")
-		#l.column().label("Custom frame names:")
 		
 		if context.scene.sprite_render_custom_framenames:
 			l.column().prop(context.scene, "sprite_render_framenames", text="Frame names")
 		
+		l.column().prop(context.scene, "sprite_render_anglenames", text="Step names")
+
+		if len(context.scene.sprite_render_anglenames) < context.scene.sprite_render_steps:
+			l.column().label("Need at least %d step names" % (context.scene.sprite_render_steps),
+			icon='ERROR')
+
 		l.row().prop(context.scene, "sprite_render_path", text="Path format")
 		row = l.row()
 		row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
 
 		
-def renderframes(scene, filepath, steps, framenames, startframe=0, endframe=0):
+def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, endframe=0):
 	camera = scene.camera
 	oldframe = scene.frame_current
 
-	stepnames = [x for x in range(1,steps+1)]
+	if steps > len(anglenames):
+		raise Exception("Not enough step names specified for current rotation step count")
+
+	stepnames = anglenames
 	
 	if not scene.sprite_render_custom_framenames:
 		framenames = [chr(ord("A") + x) for x in range(startframe,endframe+1)]
 
 	if endframe-startframe > len(framenames)-1:
 		raise Exception("Not enough frames in custom framenames")
-	
-	print("stepnames: " + str(stepnames))
-	print("framenames: " + str(framenames))
+
+	print("steps " + str(stepnames))
 	
 	frame = startframe
 	count = 0
@@ -139,10 +147,10 @@ def renderframes(scene, filepath, steps, framenames, startframe=0, endframe=0):
 			stepname = stepnames[i]
 			name = framenames[f]
 			
-			scene.render.filepath = filepath % (name, i+1)
+			scene.render.filepath = filepath % (name, stepname)
 			bpy.ops.render.render(animation=False, write_still=True)
 			
-			print ("%d:%d: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
+			print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
 			count += 1
 			
 	print ("Rendered %d shots" % (count))
@@ -181,6 +189,14 @@ def register():
 		description = "Use generated alphabetical names instead of custom defined characters.",
 		default = False
 	)
+    
+
+	bpy.types.Scene.sprite_render_anglenames = StringProperty (
+		name = "Step names",
+		description = """The naming scheme for rotation steps.
+ Each letter corresponds to a single camera angle.""",
+		default = "12345678"
+	)
 	
 def unregister():
 	bpy.utils.unregister_class(SpriteRenderOperator)
@@ -189,6 +205,7 @@ def unregister():
 	del bpy.types.Scene.sprite_render_steps
 	del bpy.types.Scene.sprite_render_framenames
 	del bpy.types.Scene.sprite_render_custom_framenames
+	del bpy.types.Scene.sprite_render_anglenames
 
 	
 if __name__ == "__main__":  

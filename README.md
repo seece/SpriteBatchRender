@@ -34,6 +34,10 @@ Output path must be of format
 
 where `%s` and `%d` will be replaced by frame name and rotation angle respectively.
 
+## Gotchas
+
+You should set the `Start Frame` property to 0 for the script to name frames properly. It's set to 1 by default.
+
 ## License
 MIT License, see `COPYING` for details.
 
