@@ -14,9 +14,6 @@ should face to the negative y direction.
 Multiple frames can be rendered. The animation frame range is read from the regular
 `Start Frame` and `End Frame` rendering properties.
 
-### Example output
-![Rotating bear animation](http://i.imgur.com/M4dFeMv.gif)
-
 ## Usage
 
 Set your camera (called `Camera`) to track an object placed at the origo. 
