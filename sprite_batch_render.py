@@ -1,6 +1,6 @@
 """
 Sprite Batch Renderer, a Blender addon
-Copyright (C) 2013 Pekka Väänänen
+Copyright (C) 2015 Pekka Väänänen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ bl_info = \
 	{
 		"name" : "Sprite Batch Render",
 		"author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-		"version" : (1, 1, 0),
+		"version" : (1, 1, 1),
 		"blender" : (2, 6, 0),
 		"location" : "Render",
 		"description" :
@@ -166,7 +166,7 @@ def register():
 		description = """Where to save the sprite frames.\
  %s = frame name\
  %d = rotation number""",
-		default = "C:/temp/sprite/sprite%s%d.png"
+		default = "C:/temp/sprite/sprite%s%s.png"
 	)
 	
 	bpy.types.Scene.sprite_render_steps = IntProperty (
