@@ -7,21 +7,24 @@ A spritesheet rendering plugin for Blender.
 
 ## What it does
 
-Renders the scene from multiple directions and saves the results in separate files.
-The "front" direction is the same as Blender's front view, in other words your model
-should face to the negative y direction.
+Renders the scene from multiple directions and saves the results as separate files.
 
 Multiple frames can be rendered. The animation frame range is read from the regular
 `Start Frame` and `End Frame` rendering properties.
 
 ## Usage
 
-Set your camera (called `Camera`) to track an object placed at the origo. 
+Set your camera (called `Camera`) to track an object placed at the origo.
+The "front" direction is the same as Blender's front view, so in other words your model
+should face to the negative y direction.
+
+> To point the camera towards an object, you can select the camera, add a Track To constraint to it (constraints can be added in the Constraints tab), choose the object in the Target field, -Z in the To field, and Y in the Up field.
+
 Place your camera to the distance and height you'd like it to render the object from.
 
-See `Sprite Batch Rendering` section of the `Render`-tab for controls.
+See `Sprite Batch Rendering` section of the `Render`-tab for controls. You can see the rendering status messages in the system console (Window > Toggle System Console). Click **Render Batch** to begin rendering.
 
-Note: the rendering process can't be canceled once started, so make sure your `Frame Range` and image resolution are correct.
+Note: **the rendering process can't be canceled** once started, so make sure your `Frame Range` and image resolution are correct.
 
 ### Example .blend file
 [http://www.lofibucket.com/blender/monkeeh.blend](monkeeh.blend) is an example how to set up the scene for sprite rendering.
@@ -47,9 +50,16 @@ When rendering ZDoom compatible sprites, the following naming schemes need to be
 * 16 steps, set step names to `192A3B4C5D6E7F8G`
 
 ## Installation
-Place [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) in `Blender/$VERSION/scripts/addons` or in `%APPDATA%/Roaming/Blender Foundation/Blender/$VERSION/scripts/addons` where `$VERSION` is your version number.
+Written for Blender 2.76b.
 
-See [Installation of an Add-On](http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Add-Ons#Installation_of_an_Add-On) for more help.
+1. Download [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) directly or as [a .zip archive.](https://github.com/seece/SpriteBatchRender/archive/master.zip). 
+2. In Blender User Preferences, press the **Install from File...** button and pick the downloaded `sprite_batch_render.py`. 
+
+You should now see the plugin under the Render section in the Add-on listing.
+
+3. Enable the plugin by checking the small checkbox on the right hand side of the plugin name.
+
+You should now see the `Sprite Batch Rendering` controls under the `Render` tab of the Outliner.
 
 ## License
 MIT License, see `COPYING` for details.
