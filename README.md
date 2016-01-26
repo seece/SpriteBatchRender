@@ -27,7 +27,7 @@ See `Sprite Batch Rendering` section of the `Render`-tab for controls. You can s
 Note: **the rendering process can't be canceled** once started, so make sure your `Frame Range` and image resolution are correct.
 
 ### Example .blend file
-[http://www.lofibucket.com/blender/monkeeh.blend](monkeeh.blend) is an example how to set up the scene for sprite rendering.
+[http://www.lofibucket.com/blender/monkeeh.blend](http://www.lofibucket.com/blender/monkeeh.blend) is an example how to set up the scene for sprite rendering.
 
 The setup is the following:
 * Camera is set to track the Suzanne mesh
