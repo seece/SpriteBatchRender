@@ -67,7 +67,7 @@ class SpriteRenderSettings(bpy.types.PropertyGroup):
 		description = """Where to save the sprite frames.\
  %s = frame name\
  %d = rotation number""",
-		default = "C:/temp/sprite/sprite%s%s.png"
+		default = "C:/temp/sprite%s%s.png"
 	)
 
 	steps = IntProperty (
@@ -90,6 +90,13 @@ class SpriteRenderSettings(bpy.types.PropertyGroup):
 		default = "12345678"
 	)
 
+	target = StringProperty (
+		name = "Target object",
+		description = """The object to be rotated. Usually an Empty
+with the actual models as children.""",
+		default = ""
+	)
+
 
 class SpriteRenderOperator(bpy.types.Operator):
 	bl_idname = "render.spriterender_operator"
@@ -97,8 +104,9 @@ class SpriteRenderOperator(bpy.types.Operator):
 	bl_options = {'REGISTER'}
 	
 	def execute(self, context):
-		renderframes(
+		self.render(
 			context.scene,
+			context.scene.sprite_render.target,
 			context.scene.sprite_render.path,
 			context.scene.sprite_render.steps,
 			context.scene.sprite_render.framenames,
@@ -108,7 +116,64 @@ class SpriteRenderOperator(bpy.types.Operator):
 		)
 		return {'FINISHED'}
 
-	   
+	def render(self, scene, obj_name, filepath, steps, framenames, anglenames,\
+			startframe=0, endframe=0):
+		camera = scene.camera
+		oldframe = scene.frame_current
+		
+		if not obj_name in scene.objects:
+			self.report({'ERROR_INVALID_INPUT'}, "Target object '%s' not found!" % (obj_name))
+			return
+		obj = scene.objects[obj_name]
+
+		if steps > len(anglenames) or steps <= 0:
+			self.report({'ERROR_INVALID_INPUT'}, "Not enough step names specified for current rotation step count")
+			return
+
+		stepnames = anglenames
+		
+		if endframe-startframe > len(framenames)-1:
+			self.report({'ERROR_INVALID_INPUT'}, "Not enough frames in custom framenames")
+			return
+
+		# print("steps " + str(stepnames))
+		# print("object:", obj_name, obj)
+
+		frame = startframe
+		count = 0
+		obj.rotation_mode = 'XYZ'
+		orig_rotation = obj.rotation_euler.z
+		
+		for f in range(startframe, endframe+1):
+			scene.frame_current = f
+			relative_frame = f - startframe
+
+			print()
+			
+			for i in range(0, steps):
+				angle = ((math.pi*2.0) / steps) * i
+
+				obj.rotation_euler.z = orig_rotation + angle
+				print (obj.rotation_euler.z)
+
+				scene.update()
+				bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+				
+				stepname = stepnames[i]
+				name = framenames[relative_frame]
+				
+				scene.render.filepath = filepath % (name, stepname)
+				bpy.ops.render.render(animation=False, write_still=True)
+				
+				#print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
+				count += 1
+				
+		print ("Rendered %d shots" % (count))
+		scene.frame_current = oldframe
+
+		obj.rotation_euler.z = orig_rotation
+			
+		
 
 class SpriteRenderPanel(bpy.types.Panel):
 	bl_idname = 'sprite_panel'
@@ -122,12 +187,24 @@ class SpriteRenderPanel(bpy.types.Panel):
 		framerow = l.row()
 		props = context.scene.sprite_render
 		
+		l.column().prop_search(props, "target", context.scene, "objects",\
+				icon='OBJECT_DATA', text="Target object")
+
+		if props.target not in context.scene.objects:
+			l.column().label("Invalid target object '%s'!" % (props.target),
+			icon='ERROR')
+
 		l.row().prop(props, "steps", text="Rotation steps")
 		l.column().prop(props, "framenames", text="Frame names")
+
+		frames = context.scene.frame_end - context.scene.frame_start
+		if frames > len(props.framenames)-1:
+			l.column().label("Need at least %d custom framenames." % (frames), icon='ERROR')
+
 		l.column().prop(props, "anglenames", text="Step names")
 
 		if len(props.anglenames) < props.steps:
-			l.column().label("Need at least %d step names" % (props.steps),
+			l.column().label("Need at least %d step names." % (props.steps),
 			icon='ERROR')
 
 		l.row().prop(props, "path", text="Path format")
@@ -135,56 +212,6 @@ class SpriteRenderPanel(bpy.types.Panel):
 		row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
 
 		
-def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, endframe=0):
-	camera = scene.camera
-	oldframe = scene.frame_current
-
-	if steps > len(anglenames):
-		raise Exception("Not enough step names specified for current rotation step count")
-
-	stepnames = anglenames
-	
-	if endframe-startframe > len(framenames)-1:
-		raise Exception("Not enough frames in custom framenames")
-
-	print("steps " + str(stepnames))
-	
-	frame = startframe
-	count = 0
-	
-	for f in range(startframe, endframe+1):
-		scene.frame_current = f
-		relative_frame = f - startframe
-
-		print()
-		
-		for i in range(0, steps):
-			angle = ((math.pi*2.0) / steps) * i
-			angle -= math.pi*0.5 # we rotate 90 degrees in counter-clockwise direction
-								 # so the first rotation angle will face straight to camera
-			
-			# we want to ignore the z-coordinate of the camera in the distance calculation,
-			# that's why we set loc.z = 0.0
-			loc = mu.Vector((camera.location.x, camera.location.y, 0.0))
-			distance = loc.magnitude
-			
-			camera.location.x = math.cos(angle) * distance
-			camera.location.y = math.sin(angle) * distance
-			
-			stepname = stepnames[i]
-			name = framenames[relative_frame]
-			
-			scene.render.filepath = filepath % (name, stepname)
-			bpy.ops.render.render(animation=False, write_still=True)
-			
-			print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
-			count += 1
-			
-	print ("Rendered %d shots" % (count))
-	scene.frame_current = oldframe
-	
-		
-	
 
 def register():
 	bpy.utils.register_class(SpriteRenderOperator)
