@@ -3,7 +3,7 @@ SpriteBatchRender
 
 A spritesheet rendering plugin for Blender.
 
-![Blender addon GUI](http://i.imgur.com/mTThmPK.png)
+![Blender addon GUI](http://i.imgur.com/SS0Et2u.png)
 
 ## What it does
 
@@ -14,26 +14,20 @@ Multiple frames can be rendered. The animation frame range is read from the regu
 
 ## Usage
 
-Set your camera (called `Camera`) to track an object placed at the origo.
-The "front" direction is the same as Blender's front view, so in other words your model
-should face to the negative y direction.
+Create an Empty and make the models to be rotated its children. This can be done by selecting all the objects, picking the parent Empty object last and pressing <kbd>Ctrl</kbd>+<kbd>P</kbd>.
 
-> To point the camera towards an object, you can select the camera, add a Track To constraint to it (constraints can be added in the Constraints tab), choose the object in the Target field, -Z in the To field, and Y in the Up field.
-
-Place your camera to the distance and height you'd like it to render the object from.
-
-See `Sprite Batch Rendering` section of the `Render`-tab for controls. You can see the rendering status messages in the system console (Window > Toggle System Console). Click **Render Batch** to begin rendering.
+Then set the correct settings from the `Sprite Batch Rendering` section of the `Render`-tab for controls. You can see the rendering status messages in the system console (Window > Toggle System Console). Click **Render Batch** to begin rendering.
 
 Note: **the rendering process can't be canceled** once started, so make sure your `Frame Range` and image resolution are correct.
 
 ### Example .blend file
-[http://www.lofibucket.com/blender/monkeeh.blend](http://www.lofibucket.com/blender/monkeeh.blend) is an example how to set up the scene for sprite rendering.
+[http://www.lofibucket.com/blender/suzanne2.blend](http://www.lofibucket.com/blender/suzanne2.blend) is an example how to set up the scene for sprite rendering.
 
 The setup is the following:
-* Camera is set to track the Suzanne mesh
-* Camera projection is set to projection mode
+* Camera projection is set to orthographic mode
 * Scene render size is set to 128x128
-* Frame range has been set to 1-1
+* Frame range has been set to 0-0
+* Sky color is set tot transparent.
 
 ### Path format
 
@@ -57,6 +51,10 @@ Written for Blender 2.76b.
 3. Enable the plugin by checking the small checkbox on the right hand side of the plugin name.
 
 You should now see the `Sprite Batch Rendering` controls under the `Render` tab of the `Outliner`.
+
+## Tips
+
+* If you want lighting to stay constant, just also parent the light to the root Empty object.
 
 ## License
 MIT License, see `COPYING` for details.
