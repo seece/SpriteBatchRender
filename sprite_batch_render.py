@@ -1,6 +1,6 @@
 """
 Sprite Batch Renderer, a Blender addon
-Copyright (C) 2015 Pekka Väänänen
+Copyright (C) 2015-2016 Pekka Väänänen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ bl_info = \
 	{
 		"name" : "Sprite Batch Render",
 		"author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-		"version" : (1, 1, 1),
+		"version" : (1, 2, 0),
 		"blender" : (2, 6, 0),
 		"location" : "Render",
 		"description" :
@@ -61,6 +61,36 @@ bl_info = \
 		"category" : "Render",
 	}
 
+class SpriteRenderSettings(bpy.types.PropertyGroup):
+	path = StringProperty (
+		name = "Sprite render path",
+		description = """Where to save the sprite frames.\
+ %s = frame name\
+ %d = rotation number""",
+		default = "C:/temp/sprite/sprite%s%s.png"
+	)
+
+	steps = IntProperty (
+		name = "Steps",
+		description = "The number of different angles to render",
+		default = 8
+	)
+
+	framenames = StringProperty (
+		name = "Frame names",
+		description = """The naming scheme for all frames.
+ Each letter corresponds to a single frame.""",
+		default = "ABCDEFGHIJKLMN"
+	)
+
+	anglenames = StringProperty (
+		name = "Step names",
+		description = """The naming scheme for rotation steps.
+ Each letter corresponds to a single camera angle.""",
+		default = "12345678"
+	)
+
+
 class SpriteRenderOperator(bpy.types.Operator):
 	bl_idname = "render.spriterender_operator"
 	bl_label = "Sprite Render Operator"
@@ -69,11 +99,11 @@ class SpriteRenderOperator(bpy.types.Operator):
 	def execute(self, context):
 		renderframes(
 			context.scene,
-			context.scene.sprite_render_path, 
-			context.scene.sprite_render_steps,
-			context.scene.sprite_render_framenames,
-			context.scene.sprite_render_anglenames,
-			context.scene.frame_start, 
+			context.scene.sprite_render.path,
+			context.scene.sprite_render.steps,
+			context.scene.sprite_render.framenames,
+			context.scene.sprite_render.anglenames,
+			context.scene.frame_start,
 			context.scene.frame_end
 		)
 		return {'FINISHED'}
@@ -90,18 +120,17 @@ class SpriteRenderPanel(bpy.types.Panel):
 	def draw(self, context):
 		l = self.layout
 		framerow = l.row()
+		props = context.scene.sprite_render
 		
-		l.row().prop(context.scene, "sprite_render_steps", text="Rotation steps")
-		
-		l.column().prop(context.scene, "sprite_render_framenames", text="Frame names")
-		
-		l.column().prop(context.scene, "sprite_render_anglenames", text="Step names")
+		l.row().prop(props, "steps", text="Rotation steps")
+		l.column().prop(props, "framenames", text="Frame names")
+		l.column().prop(props, "anglenames", text="Step names")
 
-		if len(context.scene.sprite_render_anglenames) < context.scene.sprite_render_steps:
-			l.column().label("Need at least %d step names" % (context.scene.sprite_render_steps),
+		if len(props.anglenames) < props.steps:
+			l.column().label("Need at least %d step names" % (props.steps),
 			icon='ERROR')
 
-		l.row().prop(context.scene, "sprite_render_path", text="Path format")
+		l.row().prop(props, "path", text="Path format")
 		row = l.row()
 		row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
 
@@ -160,42 +189,16 @@ def renderframes(scene, filepath, steps, framenames, anglenames, startframe=0, e
 def register():
 	bpy.utils.register_class(SpriteRenderOperator)
 	bpy.utils.register_class(SpriteRenderPanel)
+	bpy.utils.register_class(SpriteRenderSettings)
+
+	bpy.types.Scene.sprite_render = bpy.props.PointerProperty(type=SpriteRenderSettings)
 	
-	bpy.types.Scene.sprite_render_path = StringProperty (
-		name = "Sprite render path",
-		description = """Where to save the sprite frames.\
- %s = frame name\
- %d = rotation number""",
-		default = "C:/temp/sprite/sprite%s%s.png"
-	)
-	
-	bpy.types.Scene.sprite_render_steps = IntProperty (
-		name = "Steps",
-		description = "The number of different angles to render",
-		default = 8
-	)
-	
-	bpy.types.Scene.sprite_render_framenames = StringProperty (
-		name = "Frame names",
-		description = """The naming scheme for all frames.
- Each letter corresponds to a single frame.""",
-		default = "ABCDEFGHIJKLMN"
-	)
-	
-	bpy.types.Scene.sprite_render_anglenames = StringProperty (
-		name = "Step names",
-		description = """The naming scheme for rotation steps.
- Each letter corresponds to a single camera angle.""",
-		default = "12345678"
-	)
 	
 def unregister():
 	bpy.utils.unregister_class(SpriteRenderOperator)
 	bpy.utils.unregister_class(SpriteRenderPanel)
-	del bpy.types.Scene.sprite_render_path
-	del bpy.types.Scene.sprite_render_steps
-	del bpy.types.Scene.sprite_render_framenames
-	del bpy.types.Scene.sprite_render_anglenames
+	bpy.utils.unregister_class(SpriteRenderSettings)
+	del bpy.types.Scene.sprite_render
 
 	
 if __name__ == "__main__":  
