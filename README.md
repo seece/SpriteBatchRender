@@ -27,7 +27,7 @@ The setup is the following:
 * Camera projection is set to orthographic mode
 * Scene render size is set to 128x128
 * Frame range has been set to 0-0
-* Sky color is set tot transparent.
+* Sky color is set to transparent.
 
 ### Path format
 
@@ -54,7 +54,7 @@ You should now see the `Sprite Batch Rendering` controls under the `Render` tab 
 
 ## Tips
 
-* If you want lighting to stay constant, just also parent the light to the root Empty object.
+* If you want lighting to stay constant, also parent the light to the root Empty object.
 
 ## License
 MIT License, see `COPYING` for details.
