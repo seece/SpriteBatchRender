@@ -153,7 +153,7 @@ class SpriteRenderOperator(bpy.types.Operator):
 			for i in range(0, steps):
 				angle = ((math.pi*2.0) / steps) * i
 
-				obj.rotation_euler.z = orig_rotation + angle
+				obj.rotation_euler.z = orig_rotation - angle
 				print (obj.rotation_euler.z)
 
 				scene.update()
