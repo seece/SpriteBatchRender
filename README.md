@@ -3,7 +3,7 @@ SpriteBatchRender
 
 A spritesheet rendering plugin for Blender.
 
-![Blender addon GUI](http://i.imgur.com/SS0Et2u.png)
+![Blender addon GUI](doc/gui.png)
 
 ## What it does
 
@@ -18,7 +18,7 @@ Create an Empty and make the models to be rotated its children. This can be done
 
 Then set the correct settings from the `Sprite Batch Rendering` section of the `Render`-tab for controls. You can see the rendering status messages in the system console (Window > Toggle System Console). Click **Render Batch** to begin rendering.
 
-Note: **the rendering process can't be canceled** once started, so make sure your `Frame Range` and image resolution are correct.
+You can cancel the rendering by pressing <kbd>CTRL</kbd>+<kbd>C</kbd> in the System Console window.
 
 ### Example .blend file
 [http://www.lofibucket.com/blender/suzanne2.blend](http://www.lofibucket.com/blender/suzanne2.blend) is an example how to set up the scene for sprite rendering.
@@ -33,7 +33,7 @@ The setup is the following:
 
 Output path must be of format
 
-	C:/some/path/sprite%s%s.png
+    C:/some/path/sprite%s%s.png
 
 where `%s` and `%s` will be replaced by frame name and rotation step respectively.
 
@@ -44,13 +44,19 @@ When rendering ZDoom compatible sprites, the following naming schemes need to be
 * 16 steps, set step names to `192A3B4C5D6E7F8G`
 
 ## Installation
-Written for Blender 2.76b.
+Tested with Blender 2.80 beta.
 
-1. Download [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) directly or as [a .zip archive.](https://github.com/seece/SpriteBatchRender/archive/master.zip). 
+1. Download [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) directly or as [a .zip archive.](https://github.com/seece/SpriteBatchRender/archive/master.zip).
 2. In Blender User Preferences, press the **Install from File...** button and pick the downloaded `sprite_batch_render.py`. You should now see the plugin under the Render section in the Add-on listing.
 3. Enable the plugin by checking the small checkbox on the right hand side of the plugin name.
 
-You should now see the `Sprite Batch Rendering` controls under the `Render` tab of the `Outliner`.
+![Enable the plugin from settings.](doc/installation.png)
+
+You should now see the `Sprite Batch Rendering` controls under the `Render` tab of the `Outliner`:
+
+![The tab](doc/tab.png)
+
+![Blender addon GUI](doc/gui.png)
 
 ## Tips
 
