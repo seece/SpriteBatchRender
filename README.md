@@ -63,6 +63,6 @@ You should now see the `Sprite Batch Rendering` controls under the `Render` tab 
 * If you want lighting to stay constant, also parent the light to the root Empty object.
 
 ## License
-MIT License, see `COPYING` for details.
+GPLv2, see `COPYING` for details.
 
 
