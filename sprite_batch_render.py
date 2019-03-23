@@ -1,6 +1,6 @@
 """
 Sprite Batch Renderer, a Blender addon
-Copyright (C) 2015-2016 Pekka Väänänen
+Copyright (C) 2015-2019 Pekka Väänänen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -28,13 +28,13 @@ Multiple frames can be rendered. The animation Frame Range is read from the regu
 Start Frame and End Frame rendering properties.
 
 Usage:
-	Set your camera (called "Camera") to track an object placed at the origo. 
-	Place your camera to the distance and height you'd like it to render the object from.
-	
-	See Sprite Batch Rendering section of the Render-tab for controls.
-	
-	Note: the rendering process can't be canceled once started, so make sure your
-	Frame Range and image resolution are correct.
+    Set your camera (called "Camera") to track an object placed at the origo.
+    Place your camera to the distance and height you'd like it to render the object from.
+
+    See Sprite Batch Rendering section of the Render-tab for controls.
+
+    Note: the rendering process can't be canceled once started, so make sure your
+    Frame Range and image resolution are correct.
 
 """
 
@@ -42,191 +42,193 @@ import bpy
 import math
 import sys
 import time
-import mathutils as mu
+import signal
 
 from bpy.props import *
 
 bl_info = \
-	{
-		"name" : "Sprite Batch Render",
-		"author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-		"version" : (1, 2, 0),
-		"blender" : (2, 6, 0),
-		"location" : "Render",
-		"description" :
-			"Renders the scene from multiple directions.",
-		"warning" : "There's currently no way to cancel rendering",
-		"wiki_url" : "",
-		"tracker_url" : "",
-		"category" : "Render",
-	}
+    {
+        "name" : "Sprite Batch Render",
+        "author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
+        "version" : (1, 3, 0),
+        "blender" : (2, 80, 0),
+        "location" : "Render",
+        "description" :
+            "Renders the scene from multiple directions.",
+        "warning" : "There's currently no way to cancel rendering",
+        "wiki_url" : "",
+        "tracker_url" : "",
+        "category" : "Render",
+    }
 
 class SpriteRenderSettings(bpy.types.PropertyGroup):
-	path = StringProperty (
-		name = "Sprite render path",
-		description = """Where to save the sprite frames.\
+    path: StringProperty (
+        name = "Sprite render path",
+        description = """Where to save the sprite frames.\
  %s = frame name\
  %d = rotation number""",
-		default = "C:/temp/sprite%s%s.png"
-	)
+        default = "C:/temp/sprite%s%s.png"
+    )
 
-	steps = IntProperty (
-		name = "Steps",
-		description = "The number of different angles to render",
-		default = 8
-	)
+    steps: IntProperty (
+        name = "Steps",
+        description = "The number of different angles to render",
+        default = 8
+    )
 
-	framenames = StringProperty (
-		name = "Frame names",
-		description = """The naming scheme for all frames.
+    framenames: StringProperty (
+        name = "Frame names",
+        description = """The naming scheme for all frames.
  Each letter corresponds to a single frame.""",
-		default = "ABCDEFGHIJKLMN"
-	)
+        default = "ABCDEFGHIJKLMN"
+    )
 
-	anglenames = StringProperty (
-		name = "Step names",
-		description = """The naming scheme for rotation steps.
+    anglenames: StringProperty (
+        name = "Step names",
+        description = """The naming scheme for rotation steps.
  Each letter corresponds to a single camera angle.""",
-		default = "12345678"
-	)
+        default = "12345678"
+    )
 
-	target = StringProperty (
-		name = "Target object",
-		description = """The object to be rotated. Usually an Empty
+    target: StringProperty (
+        name = "Target object",
+        description = """The object to be rotated. Usually an Empty
 with the actual models as children.""",
-		default = ""
-	)
+        default = ""
+    )
 
 
 class SpriteRenderOperator(bpy.types.Operator):
-	bl_idname = "render.spriterender_operator"
-	bl_label = "Sprite Render Operator"
-	bl_options = {'REGISTER'}
-	
-	def execute(self, context):
-		self.render(
-			context.scene,
-			context.scene.sprite_render.target,
-			context.scene.sprite_render.path,
-			context.scene.sprite_render.steps,
-			context.scene.sprite_render.framenames,
-			context.scene.sprite_render.anglenames,
-			context.scene.frame_start,
-			context.scene.frame_end
-		)
-		return {'FINISHED'}
+    bl_idname = "render.spriterender_operator"
+    bl_label = "Sprite Render Operator"
+    bl_options = {'REGISTER'}
 
-	def render(self, scene, obj_name, filepath, steps, framenames, anglenames,\
-			startframe=0, endframe=0):
-		camera = scene.camera
-		oldframe = scene.frame_current
-		
-		if not obj_name in scene.objects:
-			self.report({'ERROR_INVALID_INPUT'}, "Target object '%s' not found!" % (obj_name))
-			return
-		obj = scene.objects[obj_name]
+    def execute(self, context):
+        #if frame_start is None:
+        frame_start = context.scene.frame_start
+        #if frame_end is None:
+        frame_end = context.scene.frame_end
 
-		if steps > len(anglenames) or steps <= 0:
-			self.report({'ERROR_INVALID_INPUT'}, "Not enough step names specified for current rotation step count")
-			return
+        self.render(
+            context.scene,
+            context.scene.sprite_render.target,
+            context.scene.sprite_render.path,
+            context.scene.sprite_render.steps,
+            context.scene.sprite_render.framenames,
+            context.scene.sprite_render.anglenames,
+            frame_start,
+            frame_end
+        )
+        return {'FINISHED'}
 
-		stepnames = anglenames
-		
-		if endframe-startframe > len(framenames)-1:
-			self.report({'ERROR_INVALID_INPUT'}, "Not enough frames in custom framenames")
-			return
+    def render(self, scene, obj_name, filepath, steps, framenames, anglenames,\
+            startframe=0, endframe=0):
+        camera = scene.camera
+        oldframe = scene.frame_current
 
-		# print("steps " + str(stepnames))
-		# print("object:", obj_name, obj)
+        if not obj_name in scene.objects:
+            self.report({'ERROR_INVALID_INPUT'}, "Target object '%s' not found!" % (obj_name))
+            return
+        obj = scene.objects[obj_name]
 
-		frame = startframe
-		count = 0
-		obj.rotation_mode = 'XYZ'
-		orig_rotation = obj.rotation_euler.z
-		
-		for f in range(startframe, endframe+1):
-			scene.frame_current = f
-			relative_frame = f - startframe
+        if steps > len(anglenames) or steps <= 0:
+            self.report({'ERROR_INVALID_INPUT'}, "Not enough step names specified for current rotation step count")
+            return
 
-			print()
-			
-			for i in range(0, steps):
-				angle = ((math.pi*2.0) / steps) * i
+        stepnames = anglenames
 
-				obj.rotation_euler.z = orig_rotation - angle
-				print (obj.rotation_euler.z)
+        if endframe-startframe > len(framenames)-1:
+            self.report({'ERROR_INVALID_INPUT'}, "Not enough frames in custom framenames")
+            return
 
-				scene.update()
-				bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
-				
-				stepname = stepnames[i]
-				name = framenames[relative_frame]
-				
-				scene.render.filepath = filepath % (name, stepname)
-				bpy.ops.render.render(animation=False, write_still=True)
-				
-				#print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
-				count += 1
-				
-		print ("Rendered %d shots" % (count))
-		scene.frame_current = oldframe
+        # print("steps " + str(stepnames))
+        # print("object:", obj_name, obj)
 
-		obj.rotation_euler.z = orig_rotation
-			
-		
+        frame = startframe
+        count = 0
+        obj.rotation_mode = 'XYZ'
+        orig_rotation = obj.rotation_euler.z
+
+        for f in range(startframe, endframe+1):
+            scene.frame_current = f
+            relative_frame = f - startframe
+
+            print()
+
+            for i in range(0, steps):
+                angle = ((math.pi*2.0) / steps) * i
+
+                obj.rotation_euler.z = orig_rotation - angle
+                print (obj.rotation_euler.z)
+
+                scene.update()
+                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+
+                stepname = stepnames[i]
+                name = framenames[relative_frame]
+
+                scene.render.filepath = filepath % (name, stepname)
+                bpy.ops.render.render(animation=False, write_still=True)
+
+                #print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
+                count += 1
+
+        print ("Rendered %d shots" % (count))
+        scene.frame_current = oldframe
+
+        obj.rotation_euler.z = orig_rotation
+
 
 class SpriteRenderPanel(bpy.types.Panel):
-	bl_idname = 'sprite_panel'
-	bl_label = 'Sprite Batch Rendering'
-	bl_space_type = 'PROPERTIES'
-	bl_region_type = 'WINDOW'
-	bl_context = "render"
-	
-	def draw(self, context):
-		l = self.layout
-		framerow = l.row()
-		props = context.scene.sprite_render
-		
-		l.column().prop_search(props, "target", context.scene, "objects",\
-				icon='OBJECT_DATA', text="Target object")
+    bl_idname = 'sprite_panel'
+    bl_label = 'Sprite Batch Rendering'
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "render"
 
-		if props.target not in context.scene.objects:
-			l.column().label("Invalid target object '%s'!" % (props.target),
-			icon='ERROR')
+    def draw(self, context):
+        l = self.layout
+        framerow = l.row()
+        props = context.scene.sprite_render
 
-		l.row().prop(props, "steps", text="Rotation steps")
-		l.column().prop(props, "framenames", text="Frame names")
+        l.column().prop_search(props, "target", context.scene, "objects",\
+                icon='OBJECT_DATA', text="Target object")
 
-		frames = context.scene.frame_end - context.scene.frame_start
-		if frames > len(props.framenames)-1:
-			l.column().label("Need at least %d custom framenames." % (frames), icon='ERROR')
+        if props.target not in context.scene.objects:
+            l.column().label(text = "Invalid target object '%s'!" % (props.target),
+            icon='ERROR')
 
-		l.column().prop(props, "anglenames", text="Step names")
+        l.row().prop(props, "steps", text="Rotation steps")
+        l.column().prop(props, "framenames", text="Frame names")
 
-		if len(props.anglenames) < props.steps:
-			l.column().label("Need at least %d step names." % (props.steps),
-			icon='ERROR')
+        frames = context.scene.frame_end - context.scene.frame_start
+        if frames > len(props.framenames)-1:
+            l.column().label(text = "Need at least %d custom framenames." % (frames), icon='ERROR')
 
-		l.row().prop(props, "path", text="Path format")
-		row = l.row()
-		row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
+        l.column().prop(props, "anglenames", text="Step names")
 
-		
+        if len(props.anglenames) < props.steps:
+            l.column().label(text = "Need at least %d step names." % (props.steps),
+            icon='ERROR')
+
+        l.row().prop(props, "path", text="Path format")
+        row = l.row()
+        row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
+
+classes = (SpriteRenderOperator, SpriteRenderPanel, SpriteRenderSettings)
 
 def register():
-	bpy.utils.register_class(SpriteRenderOperator)
-	bpy.utils.register_class(SpriteRenderPanel)
-	bpy.utils.register_class(SpriteRenderSettings)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
-	bpy.types.Scene.sprite_render = bpy.props.PointerProperty(type=SpriteRenderSettings)
-	
-	
+    bpy.types.Scene.sprite_render = bpy.props.PointerProperty(type=SpriteRenderSettings)
+
+
 def unregister():
-	bpy.utils.unregister_class(SpriteRenderOperator)
-	bpy.utils.unregister_class(SpriteRenderPanel)
-	bpy.utils.unregister_class(SpriteRenderSettings)
-	del bpy.types.Scene.sprite_render
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.sprite_render
 
-	
-if __name__ == "__main__":  
-	register()  
+
+if __name__ == "__main__":
+    register()
