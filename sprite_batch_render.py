@@ -55,7 +55,7 @@ bl_info = \
         "location" : "Render",
         "description" :
             "Renders the scene from multiple directions.",
-        "warning" : "There's currently no way to cancel rendering",
+        "warning" : "Open System Console to cancel rendering",
         "wiki_url" : "",
         "tracker_url" : "",
         "category" : "Render",
