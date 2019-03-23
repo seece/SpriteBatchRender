@@ -103,11 +103,19 @@ class SpriteRenderOperator(bpy.types.Operator):
     bl_label = "Sprite Render Operator"
     bl_options = {'REGISTER'}
 
+    abort = False
+
     def execute(self, context):
-        #if frame_start is None:
         frame_start = context.scene.frame_start
-        #if frame_end is None:
         frame_end = context.scene.frame_end
+
+        SpriteRenderOperator.abort = False
+
+        def handler(signum, frame):
+            print("Aborted rendering")
+            SpriteRenderOperator.abort = True
+
+        signal.signal(signal.SIGINT, handler)
 
         self.render(
             context.scene,
@@ -119,7 +127,11 @@ class SpriteRenderOperator(bpy.types.Operator):
             frame_start,
             frame_end
         )
+
+        signal.signal(signal.SIGINT, signal.default_int_handler)
+
         return {'FINISHED'}
+
 
     def render(self, scene, obj_name, filepath, steps, framenames, anglenames,\
             startframe=0, endframe=0):
@@ -141,13 +153,11 @@ class SpriteRenderOperator(bpy.types.Operator):
             self.report({'ERROR_INVALID_INPUT'}, "Not enough frames in custom framenames")
             return
 
-        # print("steps " + str(stepnames))
-        # print("object:", obj_name, obj)
-
         frame = startframe
         count = 0
         obj.rotation_mode = 'XYZ'
         orig_rotation = obj.rotation_euler.z
+        done = False
 
         for f in range(startframe, endframe+1):
             scene.frame_current = f
@@ -172,6 +182,13 @@ class SpriteRenderOperator(bpy.types.Operator):
 
                 #print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
                 count += 1
+
+                if self.abort:
+                    break
+
+            if self.abort:
+                break
+
 
         print ("Rendered %d shots" % (count))
         scene.frame_current = oldframe
@@ -213,7 +230,9 @@ class SpriteRenderPanel(bpy.types.Panel):
 
         l.row().prop(props, "path", text="Path format")
         row = l.row()
+
         row.operator("render.spriterender_operator", text="Render Batch", icon='RENDER_ANIMATION')
+
 
 classes = (SpriteRenderOperator, SpriteRenderPanel, SpriteRenderSettings)
 
