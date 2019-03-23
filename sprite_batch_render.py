@@ -183,10 +183,10 @@ class SpriteRenderOperator(bpy.types.Operator):
                 #print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
                 count += 1
 
-                if self.abort:
+                if SpriteRenderOperator.abort:
                     break
 
-            if self.abort:
+            if SpriteRenderOperator.abort:
                 break
 
 
