@@ -150,8 +150,8 @@ class SpriteRenderOperator(bpy.types.Operator):
         stepnames = anglenames
 
         if endframe-startframe > len(framenames)-1:
-            self.report({'ERROR_INVALID_INPUT'}, "Not enough frames in custom framenames")
-            return
+            self.report({'WARNING'}, "Only {0}/{1} frame names given".format(len(framenames), endframe-startframe))
+            endframe = len(framenames)-1
 
         frame = startframe
         count = 0
@@ -220,7 +220,7 @@ class SpriteRenderPanel(bpy.types.Panel):
 
         frames = context.scene.frame_end - context.scene.frame_start
         if frames > len(props.framenames)-1:
-            l.column().label(text = "Need at least %d custom framenames." % (frames), icon='ERROR')
+            l.column().label(text = "Only {1} / {0} frame names given.".format(frames, len(props.framenames)-1), icon='ERROR')
 
         l.column().prop(props, "anglenames", text="Step names")
 
