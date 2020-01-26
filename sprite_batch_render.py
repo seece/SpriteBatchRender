@@ -1,6 +1,6 @@
 """
 Sprite Batch Renderer, a Blender addon
-Copyright (C) 2015-2019 Pekka Väänänen
+Copyright (C) 2015-2020 Pekka Väänänen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ bl_info = \
     {
         "name" : "Sprite Batch Render",
         "author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-        "version" : (1, 3, 0),
+        "version" : (1, 3, 1),
         "blender" : (2, 80, 0),
         "location" : "Render",
         "description" :
@@ -171,7 +171,6 @@ class SpriteRenderOperator(bpy.types.Operator):
                 obj.rotation_euler.z = orig_rotation - angle
                 print (obj.rotation_euler.z)
 
-                scene.update()
                 bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
 
                 stepname = stepnames[i]
@@ -180,7 +179,6 @@ class SpriteRenderOperator(bpy.types.Operator):
                 scene.render.filepath = filepath % (name, stepname)
                 bpy.ops.render.render(animation=False, write_still=True)
 
-                #print ("%d:%s: %f,%f" % (f, stepname, camera.location.x, camera.location.y))
                 count += 1
 
                 if SpriteRenderOperator.abort:
