@@ -44,10 +44,10 @@ When rendering ZDoom compatible sprites, the following naming schemes need to be
 * 16 steps, set step names to `192A3B4C5D6E7F8G`
 
 ## Installation
-Tested with Blender 2.80 beta.
+Tested with Blender 2.81a.
 
 1. Download [sprite_batch_render.py](https://raw.github.com/seece/SpriteBatchRender/master/sprite_batch_render.py) directly or as [a .zip archive.](https://github.com/seece/SpriteBatchRender/archive/master.zip).
-2. In Blender User Preferences, press the **Install from File...** button and pick the downloaded `sprite_batch_render.py`. You should now see the plugin under the Render section in the Add-on listing.
+2. In Blender User Preferences, open the **Add-ons** section, press the **Install...** button and pick the downloaded `sprite_batch_render.py`. You should now see the plugin under the Render section in the Add-on listing.
 3. Enable the plugin by checking the small checkbox on the right hand side of the plugin name.
 
 ![Enable the plugin from settings.](doc/installation.png)
