@@ -1,6 +1,6 @@
 """
 Sprite Batch Renderer, a Blender addon
-Copyright (C) 2015-2020 Pekka Väänänen
+Copyright (C) 2015-2021 Pekka Väänänen
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -50,8 +50,8 @@ bl_info = \
     {
         "name" : "Sprite Batch Render",
         "author" : "Pekka Väänänen <pekka.vaananen@iki.fi>",
-        "version" : (1, 3, 1),
-        "blender" : (2, 80, 0),
+        "version" : (1, 3, 2),
+        "blender" : (2, 91, 0),
         "location" : "Render",
         "description" :
             "Renders the scene from multiple directions.",
