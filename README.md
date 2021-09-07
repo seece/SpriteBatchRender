@@ -21,7 +21,7 @@ Then set the correct settings from the `Sprite Batch Rendering` section of the `
 You can cancel the rendering by pressing <kbd>CTRL</kbd>+<kbd>C</kbd> in the System Console window.
 
 ### Example .blend file
-[http://www.lofibucket.com/blender/suzanne2.blend](http://www.lofibucket.com/blender/suzanne2.blend) is an example how to set up the scene for sprite rendering.
+[monkey_sprite_example.blend](https://www.lofibucket.com/blender/monkey_sprite_example.blend) is an example how to set up the scene for sprite rendering.
 
 The setup is the following:
 * Camera projection is set to orthographic mode
